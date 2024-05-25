@@ -1,34 +1,46 @@
 import azure.functions as func
 import logging
-import main
+import os
+import requests
+from datetime import datetime
+
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
-# @app.route(route="HttpExample")
-# def HttpExample(req: func.HttpRequest) -> func.HttpResponse:
-#     logging.info('Python HTTP trigger function processed a request.')
+@app.route(route="TimeReport")
+def TimeReport(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Python HTTP trigger function processed a request.')
 
-#     name = req.params.get('name')
-#     if not name:
-#         try:
-#             req_body = req.get_json()
-#         except ValueError:
-#             pass
-#         else:
-#             name = req_body.get('name')
+    timeReportConsid(480)
 
-#     if name:
-#         return func.HttpResponse(f"Hello, {name}. Can deez nuts fit in yo mouth.")
-#     else:
-#         return func.HttpResponse(
-#              "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
-#              status_code=200
-#         )
+    return func.HttpResponse("TimeReport was a success!")
 
-@app.route(route="timeReport", auth_level=func.AuthLevel.ANONYMOUS)
-def timeReport(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('Python HTTP trigger function. Preparing to timereport.')
 
-    main.main()
+def timeReportConsid(work_hours_in_minutes):
 
-    return func.HttpResponse(f"Timereport successfully!")
+    endpoint_time_report = 'https://tidig.consid.net/Time/PostTimeForm'
+
+
+    cookies = {
+        '.AspNetCore.Cookies': 'chunks-2',
+        '.AspNetCore.CookiesC1': os.environ["CHUNKS1"],
+        '.AspNetCore.CookiesC2': os.environ["CHUNKS2"]
+    }
+
+    # Obtain date in yyyy-mm-dd format
+    current_date = datetime.now().date()
+    formatted_date = current_date.strftime("%Y-%m-%d")
+
+    time_report_data = {
+        "dates": [formatted_date], 
+        "articleId": 1, # Normal
+        "amountMinutes": work_hours_in_minutes, 
+        "customerId": 2, # Consid AB
+        "projectId": 3313, # Internt
+        "activity": "Certifiering",
+        "caseNumber": None,
+        "description": "Normal working hours",
+        "employeeChildren": [],
+        "customerManagerName": None}
+
+    requests.post(endpoint_time_report, json=time_report_data, cookies=cookies)
