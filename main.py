@@ -35,7 +35,7 @@ def timeReport(work_hours_in_minutes):
         "employeeChildren": [],
         "customerManagerName": None}
 
-    response = requests.post(endpoint_time_report, json=time_report_data, cookies=cookies)
+    requests.post(endpoint_time_report, json=time_report_data, cookies=cookies)
 
 if __name__ == '__main__':
     main()
