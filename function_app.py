@@ -5,7 +5,7 @@ import requests
 from datetime import datetime
 
 
-app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
 @app.route(route="timereport")
 def TimeReport(req: func.HttpRequest) -> func.HttpResponse:
