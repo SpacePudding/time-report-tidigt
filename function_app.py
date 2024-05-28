@@ -11,12 +11,17 @@ app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 def TimeReport(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
-    timeReportConsid(480)
+    # Obtain date in yyyy-mm-dd format
+    current_date = datetime.now().date()
+    formatted_date = current_date.strftime("%Y-%m-%d")
+    work_in_minutes = 480
+
+    timeReportConsid(formatted_date, work_in_minutes)
 
     return func.HttpResponse("TimeReport was a success!")
 
 
-def timeReportConsid(work_hours_in_minutes):
+def timeReportConsid(formatted_date, work_in_minutes):
 
     endpoint_time_report = 'https://tidig.consid.net/Time/PostTimeForm'
 
@@ -26,14 +31,10 @@ def timeReportConsid(work_hours_in_minutes):
         '.AspNetCore.CookiesC2': os.environ["CHUNK2"]
     }
 
-    # Obtain date in yyyy-mm-dd format
-    current_date = datetime.now().date()
-    formatted_date = current_date.strftime("%Y-%m-%d")
-
     time_report_data = {
         "dates": [formatted_date], 
         "articleId": 1, # Normal
-        "amountMinutes": work_hours_in_minutes, 
+        "amountMinutes": work_in_minutes, 
         "customerId": 2, # Consid AB
         "projectId": 3313, # Internt
         "activity": "Certifiering",
