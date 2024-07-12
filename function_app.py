@@ -4,7 +4,8 @@ import workhours
 import os
 import requests
 from datetime import datetime
-
+from azure.storage.blob import BlobServiceClient
+import json
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -16,7 +17,8 @@ def TimeReport(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
     try:
-        time_report = workhours.obtain_workhours_this_month()
+        json_data = obtain_work_sheet_from_storage()
+        time_report = workhours.extract_time_at_workplace(json_data)
         timeReportConsid(time_report)
     except Exception as e:
         logger.error(f'An unexpected error occurred: {e}')
@@ -24,6 +26,26 @@ def TimeReport(req: func.HttpRequest) -> func.HttpResponse:
 
     return func.HttpResponse("TimeReport was a success!")
 
+def obtain_work_sheet_from_storage():
+
+    connection_string = os.environ["connection_string"]
+    blob_service_client = BlobServiceClient.from_connection_string(connection_string)
+
+     # Get blob client to interact with a specific container and blob
+    container_name = os.environ["container_name"]
+    blob_name = get_month_file()
+    blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
+
+    download_stream = blob_client.download_blob()
+    file_content = download_stream.readall()
+
+    return json.loads(file_content.decode('utf-8'))
+
+def get_month_file():
+    today = datetime.today()
+    formatted_date = f"{today.strftime('%Y_%B').upper()}.json"
+
+    return formatted_date
 
 def timeReportConsid(time_report):
 

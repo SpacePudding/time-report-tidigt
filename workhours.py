@@ -1,22 +1,4 @@
-import json
 from datetime import datetime
-import logging
-import sys
-
-def obtain_workhours_this_month():
-    
-    file_path = get_month_file()
-
-    with open(file_path, 'r') as file:
-        data = json.load(file)
-    
-    return extract_time_at_workplace(data)
-
-def get_month_file():
-    today = datetime.today()
-    formatted_date = f"{today.strftime('%Y_%B').upper()}.json"
-
-    return formatted_date
 
 def extract_time_at_workplace(data):          
         monthly_time_json_table = {}
