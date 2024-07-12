@@ -1,13 +1,18 @@
 import json
 from datetime import datetime
+import logging
+import sys
 
 def obtain_workhours_this_month():
     
     file_path = get_month_file()
 
-    with open(file_path, 'r') as file:
-        data = json.load(file)
-        
+    try:
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        logging.error(f'File not found: {file_path}')
+        sys.exit(1)
     return extract_time_at_workplace(data)
 
 def get_month_file():
