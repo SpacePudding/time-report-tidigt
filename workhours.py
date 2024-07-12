@@ -7,12 +7,9 @@ def obtain_workhours_this_month():
     
     file_path = get_month_file()
 
-    try:
-        with open(file_path, 'r') as file:
-            data = json.load(file)
-    except FileNotFoundError:
-        logging.error(f'File not found: {file_path}')
-        sys.exit(1)
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+    
     return extract_time_at_workplace(data)
 
 def get_month_file():

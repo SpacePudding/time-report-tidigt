@@ -4,6 +4,7 @@ import workhours
 import os
 import requests
 from datetime import datetime
+import traceback
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
@@ -11,9 +12,13 @@ app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 def TimeReport(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
-    time_report = workhours.obtain_workhours_this_month()
-
-    timeReportConsid(time_report)
+    try:
+        time_report = workhours.obtain_workhours_this_month()
+        timeReportConsid(time_report)
+    except Exception as e:
+        error_message = traceback.format_exc()
+        print("Error occurred:", error_message)
+        return func.HttpResponse("TimeReport was not a success!")
 
     return func.HttpResponse("TimeReport was a success!")
 
