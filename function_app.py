@@ -4,7 +4,10 @@ import workhours
 import os
 import requests
 from datetime import datetime
-import traceback
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
@@ -16,9 +19,8 @@ def TimeReport(req: func.HttpRequest) -> func.HttpResponse:
         time_report = workhours.obtain_workhours_this_month()
         timeReportConsid(time_report)
     except Exception as e:
-        error_message = traceback.format_exc()
-        print("Error occurred:", error_message)
-        return func.HttpResponse("TimeReport was not a success!")
+        logger.error(f'An unexpected error occurred: {e}')
+        return func.HttpResponse("TimeReport was not a success!", status_code=500)
 
     return func.HttpResponse("TimeReport was a success!")
 
